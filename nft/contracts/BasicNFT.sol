@@ -5,6 +5,8 @@ pragma solidity ^0.8.7;
 
 contract BasicNFT is ERC721 {
     uint256 private tokenCounter;
+    string public constant TOKEN_URI =
+        "ipfs://bafybeig37ioir76s7mg5oobetncojcm3c3hxasyd4rvid4jqhy4gkaheg4/?filename=0-PUG.json";
 
     constructor() ERC721("Dogie", "DOG") {
         tokenCounter = 0;
@@ -16,6 +18,12 @@ contract BasicNFT is ERC721 {
         return tokenCounter;
     }
 
+    function tokenURI(
+        uint256 /*_tokenId*/
+    ) public view override returns (string memory) {
+        return TOKEN_URI;
+    }
+    
     function getTokenCounter() public view returns(uint256) {
         return tokenCounter;
     }

@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 pragma solidity ^0.8.7;
 
@@ -14,8 +16,15 @@ pragma solidity ^0.8.7;
  * @notice The owner of the contract can withdraw the ETH
  * 
  */
-contract RandomIpfsNft is ERC721 {
-    constructor() {
+contract RandomIpfsNft is VRFConsumerBaseV2 {
+    VRFCoordinatorV2Interface private immutable vrfCoordinator;
 
+    constructor(address vrfCoordinatorV2) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
     }
+
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
+        
+    }
+
 }

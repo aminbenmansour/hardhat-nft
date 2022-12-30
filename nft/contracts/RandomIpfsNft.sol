@@ -18,6 +18,11 @@ pragma solidity ^0.8.7;
  */
 contract RandomIpfsNft is ERC721, VRFConsumerBaseV2 {
     
+    enum Breed {
+        PUG,
+        SHIBA_INU,
+        ST_BERNARD
+    }
     // Chainlink VRF Variables
     VRFCoordinatorV2Interface private immutable vrfCoordinator;
     uint64 private immutable subscriptionId;
@@ -31,6 +36,7 @@ contract RandomIpfsNft is ERC721, VRFConsumerBaseV2 {
 
     // NFT VARiables
     uint256 public tokenCounter;
+    uint256 internal constant MAX_CHANCE_VALUE = 100;
 
     constructor(
         address vrfCoordinatorV2,
@@ -60,6 +66,23 @@ contract RandomIpfsNft is ERC721, VRFConsumerBaseV2 {
         address dogOwner = requestIdToSender[requestId];
         uint256 newTokenId = tokenCounter;
         _safeMint(dogOwner, newTokenId);
+
+        uint256 moddedRng = randomWords[0] % MAX_CHANCE_VALUE;
+    }
+
+    function getBreedFromModdedRng(uint256 moddedRng)  public pure returns (Breed) {
+        uint256 cumulativeSum = 0;
+        uint256[3] memory chanceArray = getChanceArray();
+
+        for (uint256 i = 0; i < chanceArray.length; i++) {
+            if (moddedRng >= cumulativeSum && moddedRng < cumulativeSum + chanceArray[i]) {
+                return Breed(i);
+            }
+            cumulativeSum += chanceArray[i];
+        }
+    }
+    function getChanceArray() public pure returns(uint256[3] memory) {
+        return [10, 30, MAX_CHANCE_VALUE];
     }
 
 }

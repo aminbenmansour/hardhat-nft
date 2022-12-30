@@ -1,12 +1,16 @@
 const { network, ethers } = require("hardhat")
 const { developmentChains, networkConfig } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
+const { storeImages } = require("../utils/uploadToPinata")
+
+const imagesLocation = "./images/randomNFT"
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
-
+    
+    let tokenURIs
     let vrfCoordinatorV2Address, subscriptionId
 
     if (developmentChains.includes(network.name)) {
@@ -21,6 +25,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     }
 
     log("--------------------------")
+    await storeImages(imagesLocation)
     const args = [
         vrfCoordinatorV2Address,
         subscriptionId,

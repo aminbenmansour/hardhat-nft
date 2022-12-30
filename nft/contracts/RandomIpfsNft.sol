@@ -17,10 +17,25 @@ pragma solidity ^0.8.7;
  * 
  */
 contract RandomIpfsNft is VRFConsumerBaseV2 {
+    
+    // Chainlink VRF Variables
     VRFCoordinatorV2Interface private immutable vrfCoordinator;
+    uint64 private immutable subscriptionId;
+    bytes32 private immutable gasLane;
+    uint32 private immutable callbackGasLimit;
+    uint16 private constant REQUEST_CONFIRMATIONS = 3;
+    uint32 private constant NUM_WORDS = 1;
 
-    constructor(address vrfCoordinatorV2) VRFConsumerBaseV2(vrfCoordinatorV2) {
+    constructor(
+        address vrfCoordinatorV2,
+        uint64 _subscriptionId,
+        bytes32 _gasLane,
+        uint32 _callbackGasLimit
+    ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        subscriptionId = _subscriptionId;
+        gasLane = _gasLane;
+        callbackGasLimit = _callbackGasLimit;
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {

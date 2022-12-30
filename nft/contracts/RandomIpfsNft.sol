@@ -5,6 +5,7 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 pragma solidity ^0.8.7;
 
+error RandomIpfsNft__RangeOutOdBounds();
 /**
  * @notice Minitng an NFT will trigger a ChainlinkVRF call to get a random number
  * @notice Using that number, we will get a random NFT
@@ -65,9 +66,16 @@ contract RandomIpfsNft is ERC721, VRFConsumerBaseV2 {
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
         address dogOwner = requestIdToSender[requestId];
         uint256 newTokenId = tokenCounter;
+        
+        uint256 moddedRng = randomWords[0] % MAX_CHANCE_VALUE; // number between 0 and 99
+
+        // [0-9] -> PUG
+        // [10 - 39] -> Shiba Inu
+        // [40-99] -> St. Bernard
+
+        Breed dogBreed = getBreedFromModdedRng(moddedRng);
         _safeMint(dogOwner, newTokenId);
 
-        uint256 moddedRng = randomWords[0] % MAX_CHANCE_VALUE;
     }
 
     function getBreedFromModdedRng(uint256 moddedRng)  public pure returns (Breed) {
@@ -80,6 +88,7 @@ contract RandomIpfsNft is ERC721, VRFConsumerBaseV2 {
             }
             cumulativeSum += chanceArray[i];
         }
+        revert RandomIpfsNft__RangeOutOdBounds();
     }
     function getChanceArray() public pure returns(uint256[3] memory) {
         return [10, 30, MAX_CHANCE_VALUE];

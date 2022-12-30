@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
@@ -17,7 +17,7 @@ error RandomIpfsNft__RangeOutOdBounds();
  * @notice The owner of the contract can withdraw the ETH
  * 
  */
-contract RandomIpfsNft is ERC721, VRFConsumerBaseV2 {
+contract RandomIpfsNft is ERC721URIStorage, VRFConsumerBaseV2 {
     
     enum Breed {
         PUG,
@@ -38,17 +38,20 @@ contract RandomIpfsNft is ERC721, VRFConsumerBaseV2 {
     // NFT VARiables
     uint256 public tokenCounter;
     uint256 internal constant MAX_CHANCE_VALUE = 100;
+    string[] internal dogTokenURIs;
 
     constructor(
         address vrfCoordinatorV2,
         uint64 _subscriptionId,
         bytes32 _gasLane,
-        uint32 _callbackGasLimit
+        uint32 _callbackGasLimit,
+        string[] memory _dogTokenURIs
     ) VRFConsumerBaseV2(vrfCoordinatorV2) ERC721("Random IPFS NFT", "RIN") {
         vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         subscriptionId = _subscriptionId;
         gasLane = _gasLane;
         callbackGasLimit = _callbackGasLimit;
+        dogTokenURIs = _dogTokenURIs;
     }
 
     function requestNft() public returns (uint256 requestId) {
@@ -75,6 +78,7 @@ contract RandomIpfsNft is ERC721, VRFConsumerBaseV2 {
 
         Breed dogBreed = getBreedFromModdedRng(moddedRng);
         _safeMint(dogOwner, newTokenId);
+        _setTokenURI(newTokenId, dogTokenURIs[uint256(dogBreed)]);
 
     }
 

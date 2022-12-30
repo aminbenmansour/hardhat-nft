@@ -36,3 +36,5 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     ]
     log("--------------------------")
 }
+
+module.exports.tags = ["all", "main", "randomipfs"]

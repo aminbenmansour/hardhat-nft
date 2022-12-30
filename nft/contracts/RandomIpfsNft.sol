@@ -16,7 +16,7 @@ pragma solidity ^0.8.7;
  * @notice The owner of the contract can withdraw the ETH
  * 
  */
-contract RandomIpfsNft is VRFConsumerBaseV2 {
+contract RandomIpfsNft is ERC721, VRFConsumerBaseV2 {
     
     // Chainlink VRF Variables
     VRFCoordinatorV2Interface private immutable vrfCoordinator;
@@ -26,12 +26,18 @@ contract RandomIpfsNft is VRFConsumerBaseV2 {
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
 
+    // VRF helpers
+    mapping(uint256 => address) public requestIdToSender; 
+
+    // NFT VARiables
+    uint256 public tokenCounter;
+
     constructor(
         address vrfCoordinatorV2,
         uint64 _subscriptionId,
         bytes32 _gasLane,
         uint32 _callbackGasLimit
-    ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+    ) VRFConsumerBaseV2(vrfCoordinatorV2) ERC721("Random IPFS NFT", "RIN") {
         vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         subscriptionId = _subscriptionId;
         gasLane = _gasLane;
@@ -46,10 +52,14 @@ contract RandomIpfsNft is VRFConsumerBaseV2 {
             callbackGasLimit,
             NUM_WORDS
         );
+
+        requestIdToSender[requestId] = msg.sender;
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
-        
+        address dogOwner = requestIdToSender[requestId];
+        uint256 newTokenId = tokenCounter;
+        _safeMint(dogOwner, newTokenId);
     }
 
 }

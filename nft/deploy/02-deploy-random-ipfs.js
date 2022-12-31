@@ -1,8 +1,7 @@
 const { network, ethers } = require("hardhat")
 const { developmentChains, networkConfig } = require("../helper-hardhat-config")
-const { verify } = require("../utils/verify")
 const { storeImages, storeTokenUriMetadata } = require("../utils/uploadToPinata")
-const { Token } = require("nft.storage")
+const { verify } = require("../utils/verify")
 
 const imagesLocation = "./images/randomNFT"
 
@@ -49,17 +48,22 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         subscriptionId,
         networkConfig[chainId].gasLane,
         networkConfig[chainId].callbackGasLimit,
-        // tokenUris
+        tokenURIs,
         networkConfig[chainId].mintFee,
     ]
+
+    const randomIpfsNft = await deploy("RandomIpfsNft", {
+        from: deployer,
+        args: args,
+        log: true,
+        waitConfirmations: network.config.blockConfirmations || 1
+    })
     log("--------------------------")
 }
 
 async function handleTokenURIs() {
     tokenURIs = []
-
-    // Store image in IPFS
-    // Store metadata in IPFS
+    // Store image and metadata in IPFS
     const { responses: imageUploadResponses, files } = await storeImages(imagesLocation)
     for(imageUploadResponseIndex in imageUploadResponses) {
         // create metadata

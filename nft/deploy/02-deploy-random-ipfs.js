@@ -59,6 +59,10 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         waitConfirmations: network.config.blockConfirmations || 1
     })
     log("--------------------------")
+    if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
+        log("Verifying ...")
+        await verify(randomIpfsNft.address, args)
+    }
 }
 
 async function handleTokenURIs() {

@@ -1,7 +1,8 @@
 const { network, ethers } = require("hardhat")
 const { developmentChains, networkConfig } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
-const { storeImages } = require("../utils/uploadToPinata")
+const { storeImages, storeTokenUriMetadata } = require("../utils/uploadToPinata")
+const { Token } = require("nft.storage")
 
 const imagesLocation = "./images/randomNFT"
 
@@ -67,9 +68,15 @@ async function handleTokenURIs() {
         tokenURIsMetadata.name = files[imageUploadResponseIndex].replace(".png", "")
         tokenURIsMetadata.description = `An adorable ${tokenURIsMetadata.name} pup!`
         tokenURIsMetadata.image = `ipfs://${imageUploadResponses[imageUploadResponseIndex].IpfsHash}`
+        
+        console.log(`Uploading ${tokenURIsMetadata.name}...`)
+        // Store JSON to IPFS through Pinata
+        const metadataUploadResponse = await storeTokenUriMetadata(tokenURIsMetadata)
+        tokenURIs.push(`ipfs://${metadataUploadResponse.IpfsHash}`)
     }
 
-    
+    console.log("Token URIs Uploaded! They are:")
+    console.log(tokenURIs)
     return tokenURIs
 }
 

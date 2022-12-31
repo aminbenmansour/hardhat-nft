@@ -5,6 +5,18 @@ const { storeImages } = require("../utils/uploadToPinata")
 
 const imagesLocation = "./images/randomNFT"
 
+const metadataTemplate = {
+    name: "",
+    description: "",
+    image: "",
+    attributes: [
+        {
+            trait_type: "Cuteness",
+            value: 100
+        }
+    ]
+}
+
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()

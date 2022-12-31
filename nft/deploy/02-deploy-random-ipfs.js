@@ -17,6 +17,7 @@ const metadataTemplate = {
     ]
 }
 
+const FUND_AMOUNT = 10000000000000000000 // 10 LINK
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
@@ -36,6 +37,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         const tx = await vrfCoordinatorV2Mock.createSubscription()
         const txReceipt = await tx.wait(1)
         subscriptionId = txReceipt.events[0].args.subId
+        await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT)
     } else {
         vrfCoordinatorV2Address = networkConfig[chainId].vrfCoordinatorV2
         subscriptionId = networkConfig[chainId].subscriptionId

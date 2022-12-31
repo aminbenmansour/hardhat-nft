@@ -13,6 +13,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     let tokenURIs
     let vrfCoordinatorV2Address, subscriptionId
 
+    // get the IPFS hashes to our images
+    if (process.env.UPLOAD_TO_PINATA == "true") {
+        tokenURIs = await handleTokenURIs()
+    }
+    
     if (developmentChains.includes(network.name)) {
         const vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
         vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
@@ -35,6 +40,16 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         networkConfig[chainId].mintFee,
     ]
     log("--------------------------")
+}
+
+async function handleTokenURIs() {
+    tokenURIs = []
+
+    // Store image in IPFS
+    // Store metadata in IPFS
+    const { responses: imageUploadResponses, files } = await storeImages(imagesLocation)
+    
+    return tokenURIs
 }
 
 module.exports.tags = ["all", "main", "randomipfs"]
